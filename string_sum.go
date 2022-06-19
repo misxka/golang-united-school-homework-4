@@ -2,6 +2,9 @@ package string_sum
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 //use these errors as appropriate, wrapping them with fmt.Errorf function
@@ -23,5 +26,38 @@ var (
 // Use the errors defined above as described, again wrapping into fmt.Errorf
 
 func StringSum(input string) (output string, err error) {
-	return "", nil
+	input = strings.ReplaceAll(input, " ", "")
+	if input == "" {
+		return "", fmt.Errorf("%w", errorEmptyInput)
+	}
+
+	operands := strings.Split(input, "+")
+	if len(operands) == 1 {
+		minusAmount := strings.Count(operands[0], "-")
+		operands = strings.Split(strings.TrimLeft(operands[0], "-"), "-")
+
+		if minusAmount == 1 {
+			operands[1] = "-" + operands[1]
+		}
+
+		if minusAmount == 2 {
+			operands[0] = "-" + operands[0]
+			operands[1] = "-" + operands[1]
+		}
+	}
+	if len(operands) != 2 {
+		return "", fmt.Errorf("%w", errorNotTwoOperands)
+	}
+
+	firstOperand, e := strconv.ParseInt(operands[0], 10, 64)
+	if e != nil {
+		return "", fmt.Errorf("%w", e)
+	}
+
+	secondOperand, e := strconv.ParseInt(operands[1], 10, 64)
+	if e != nil {
+		return "", fmt.Errorf("%w", e)
+	}
+
+	return strconv.FormatInt(firstOperand+secondOperand, 10), nil
 }
